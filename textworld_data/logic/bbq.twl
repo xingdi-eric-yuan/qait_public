@@ -1,0 +1,25 @@
+type bbq : t {
+    rules {
+        cook/bbq/raw           :: $at(P, r) & $at(bbq, r) & $in(f, I) & raw(f)                         -> grilled(f) & cooked(f);
+        cook/bbq/burned        :: $at(P, r) & $at(bbq, r) & $in(f, I) & cooked(f) & edible(f)          -> burned(f) & inedible(f);
+        cook/bbq/needs_cooking :: $at(P, r) & $at(bbq, r) & $in(f, I) & needs_cooking(f) & inedible(f) -> grilled(f) & edible(f) & cooked(f);
+    }
+
+    inform7 {
+        type {
+            kind :: "bbq-like";
+            definition :: "bbq-like is a source of heat. bbq-like are fixed in place.";
+        }
+
+        predicates {
+            heat_source(bbq) :: "";
+            fixed(bbq) :: "";
+        }
+
+        commands {
+            cook/bbq/raw           :: "cook {f} with {bbq}" :: "cooking the {f}";
+            cook/bbq/burned        :: "cook {f} with {bbq}" :: "cooking the {f}";
+            cook/bbq/needs_cooking :: "cook {f} with {bbq}" :: "cooking the {f}";
+        }
+    }
+}

@@ -1,0 +1,227 @@
+# food
+type f : o {
+    predicates {
+        consumed(f);
+        edible(f);
+        inedible(f);
+
+        needs_cooking(f);
+        raw(f);
+        cooked(f);
+        burned(f);
+
+        roasted(f);
+        fried(f);
+        grilled(f);
+        # boiled(f);
+        # steamed(f);
+
+        uncut(f);
+        chopped(f);
+        sliced(f);
+        diced(f);
+    }
+
+    rules {
+        eat :: in(f, I) & edible(f) -> consumed(f);
+        drink :: in(f, I) & drinkable(f) -> consumed(f);
+        slice :: $in(f, I) & $in(o, I) & $sharp(o) & uncut(f) -> sliced(f);
+        dice :: $in(f, I) & $in(o, I) & $sharp(o) & uncut(f) -> diced(f);
+        chop :: $in(f, I) & $in(o, I) & $sharp(o) & uncut(f) -> chopped(f);
+    }
+
+    constraints {
+        consumed1 :: consumed(f) & in(f, I) -> fail();
+        consumed2 :: consumed(f) & in(f, c) -> fail();
+        consumed3 :: consumed(f) & on(f, s) -> fail();
+        consumed4 :: consumed(f) & at(f, r) -> fail();
+    }
+
+    inform7 {
+        type {
+            kind :: "food";
+            definition :: "food is usually edible. food is cookable. food has a type of cooking. food has a type of cutting. food can be cooked. food can be burned. food can be consumed. food is usually not consumed. food is usually cuttable.";
+        }
+
+        predicates {
+            edible(f) :: "The {f} is edible";
+            inedible(f) :: "The {f} is inedible";
+            consumed(f) :: "The {f} is consumed";
+
+            needs_cooking(f) :: "The {f} is needs cooking";
+
+            raw(f) :: "The {f} is raw";
+            cooked(f) :: "The {f} is cooked";
+            burned(f) :: "The {f} is burned";
+            fried(f) :: "The {f} is fried";
+            grilled(f) :: "The {f} is grilled";
+            roasted(f) :: "The {f} is roasted";
+
+            uncut(f) :: "The {f} is uncut";
+            sliced(f) :: "The {f} is sliced";
+            chopped(f) :: "The {f} is chopped";
+            diced(f) :: "The {f} is diced";
+        }
+
+        commands {
+            eat :: "eat {f}" :: "eating the {f}";
+            drink :: "drink {f}" :: "drinking the {f}";
+            slice :: "slice {f} with {o}" :: "slicing the {f}";
+            dice  :: "dice {f} with {o}"  :: "dicing the {f}";
+            chop  :: "chop {f} with {o}"  :: "chopping the {f}";
+        }
+
+        code :: """
+            [Drinking liquid]
+            The block drinking rule is not listed in any rulebook.
+
+            After drinking:
+                Now the noun is consumed;
+                Continue the action.
+
+            Check an actor drinking (this is the can't drink unless drinkable rule):
+                if the noun is not a thing or the noun is not drinkable:
+                    say "You cannot drink [the noun].";
+                    rule fails;
+                if the noun is not carried by the player:
+                    say "You should take [the noun] first.";
+                    rule fails
+
+            Carry out an actor drinking (this is the drinking rule):
+                remove the noun from play.
+
+            Report an actor drinking (this is the report drinking rule):
+                if the actor is the player:
+                    say "You drink [the noun]. Not bad.";
+                otherwise:
+                    say "[The person asked] just drunk [the noun].".
+
+            [Eating food]
+            After eating a food (called target):
+                Now the target is consumed;
+                Continue the action.
+
+            Check eating inedible food (called target):
+                if target is needs cooking:
+                    say "You should cook [the target] first.";
+                    rule fails.
+
+            [Understanding things by their properties - http://inform7.com/learn/man/WI_17_15.html]
+            Understand the type of cutting property as describing food.
+            Understand the type of cooking property as describing food.
+
+            [Processing food]
+            Understand the commands  "slice", "prune" as something new.
+            The block cutting rule is not listed in any rulebook.
+            Dicing is an action applying to one carried thing.
+            Slicing is an action applying to one carried thing.
+            Chopping is an action applying to one carried thing.
+
+            Slicing something is a cutting activity.
+            Dicing something is a cutting activity.
+            Chopping something is a cutting activity.
+
+            Check an actor cutting (this is the generic cut is now allowed rule):
+                say "You need to specify how you want to cut [the noun]. Either slice, dice, or chop it.";
+                rule fails.
+
+            Before a cutting activity when the noun is not cuttable:
+                say "Can only cut cuttable food.";
+                rule fails.
+
+            Before a cutting activity when the noun is cuttable and the noun is not uncut:
+                say "[The noun] has already been [type of cutting of the noun].";
+                rule fails.
+
+            Before a cutting activity when the list of sharp things carried by the player is empty:
+                say "Cutting something requires something sharp like a knife.";
+                rule fails.
+
+            Before printing the name of a food (called the food item) which is not uncut while looking, examining, listing contents or taking inventory:
+                say "[type of cutting of food item] ".
+
+
+            [Slicing food]
+            Carry out slicing a carried food (called the food item):
+                Now the food item is sliced;
+                Let sharp object be the entry 1 in the list of sharp things carried by the player;
+                say "You slice the [food item] using the [sharp object].".
+
+            Understand "slice [something]" as slicing.
+
+            [Dicing food]
+            Carry out dicing a carried food (called the food item):
+                Now the food item is diced;
+                Let sharp object be the entry 1 in the list of sharp things carried by the player;
+                say "You dice the [food item] using the [sharp object].";
+
+            Understand "dice [something]" as dicing.
+
+            [Chopping food]
+            Carry out chopping a carried food (called the food item):
+                Now the food item is chopped;
+                Let sharp object be the entry 1 in the list of sharp things carried by the player;
+                say "You chop the [food item] using the [sharp object].";
+
+            Understand the command "chop" as something new. [Remove its association with slicing]
+            Understand "chop [something]" as chopping.
+
+            [Cooking food]
+            Cooking is an action applying to one thing.
+
+            Check cooking something not cookable (this is the cook only cookable things rule):
+                say "[The noun] is not cookable." instead.
+
+            Check cooking something cookable when the list of touchable source of heat things is empty (this is the cooking requires a source of heat rule):
+                say "Cooking requires a source of heat." instead.
+
+            Check cooking something cookable not carried by the player (this is the cookable thing location rule):
+                if the noun is not carried by the player and the noun is not on a source of heat thing and the noun is not in a source of heat thing:
+                    say "[The noun] has to be in your inventory or placed on/in a source of heat." instead.
+
+            A rule for reaching inside a source of heat while cooking:
+                allow access.
+
+            After deciding the scope of the player:
+                repeat with source of heat running through the list of source of heat containers:
+                    place the contents of the source of heat in scope.
+
+            Carry out cooking a food (called the food item):
+                Let source of heat be the entry 1 in the list of touchable source of heat things;
+                if the food item is on a source of heat thing (called clocation):
+                    Now the source of heat is the clocation;
+                if the food item is in a source of heat thing (called clocation):
+                    Now the source of heat is the clocation;
+                if the food item is cooked:
+                    Now the food item is burned;
+                    Now the food item is not edible;
+                    say "You cook the already [type of cooking of food item] [food item] using [the source of heat]. It is burned now!";
+                    stop;
+                otherwise:
+                    Now the food item is cooked;
+                if the food item is needs cooking:
+                    Now the food item is edible;
+                    Now the food item is not needs cooking;
+                if the source of heat is a stove-like:
+                    Now the food item is fried;
+                    say "You fry the [food item] using [the source of heat].";
+                else if the source of heat is a oven-like:
+                    Now the food item is roasted;
+                    say "You roast the [food item] using [the source of heat].";
+                else if the source of heat is a bbq-like:
+                    Now the food item is grilled;
+                    say "You grill the [food item] using [the source of heat].";
+
+            Understand "cook [something]" as cooking.
+
+            Before printing the name of a food (called the food item) while looking, examining, listing contents or taking inventory:
+                if the food item is needs cooking:
+                    say "raw ";
+                else if the food item is burned:
+                    say "burned ";
+                else if the food item is not raw:
+                    say "[type of cooking of food item] ".
+
+        """;
+    }
+}

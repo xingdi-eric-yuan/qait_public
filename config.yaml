@@ -1,0 +1,83 @@
+general:
+  train_data_size: 1  #-1 means unlimited games, where games are generated on the fly. In paper we use [1, 2, 10, 100, 500, -1], feel free to use any number.
+  testset_path: "test_set"
+  random_map: True  # If True, map size is sampled from [2, 12], if False, then map size is fixed to be 6.
+  question_type: "location"  # location, existence, attribute
+  random_seed: 42  # the secret of deep learning.
+  naozi_capacity: 1  # agent keeps this many history observations. In paper we do not use a size larger than 1, i.e., we do not keep history. Feel free to play with it, tho.
+  use_cuda: True  # disable this when running on machine without cuda
+
+training:
+  batch_size: 1
+  max_episode: 1000000
+  learn_start_from_this_episode: 1000
+  target_net_update_frequency: 1000  # sync target net with online net per this many epochs
+  max_nb_steps_per_episode: 50  # after this many steps, a game is terminated
+  qa_loss_lambda: 1.0
+  interaction_loss_lambda: 1.0
+  optimizer:
+    step_rule: 'adam'  # adam
+    learning_rate: 0.00025
+    clip_grad_norm: 5
+
+evaluate:
+  run_eval: False
+  batch_size: 1
+  max_nb_steps_per_episode: 50  # after this many steps, a game is terminated
+
+checkpoint:
+  save_checkpoint: True
+  save_frequency: 1000  # episode
+  experiment_tag: 'name_your_current_experiment_here'
+  load_pretrained: False  # during test, enable this so that the agent load your pretrained model
+  load_from_tag: 'your_previous_experiemnt_model'  # if you want to load from prev experiment
+
+replay:
+  discount_gamma: 0.9
+  replay_memory_capacity: 500000  # adjust this depending on your RAM size
+  replay_memory_priority_fraction: 0.5
+  update_per_k_game_steps: 20
+  replay_batch_size: 64
+  multi_step: 1
+
+distributional:
+  enable: False
+  atoms: 51
+  v_min: -10
+  v_max: 10
+
+dueling_networks: False
+
+double_dqn: True
+
+epsilon_greedy:
+  noisy_net: False  # if this is true, then epsilon greedy is disabled
+  epsilon_anneal_episodes: 100000  # -1 if not annealing
+  epsilon_anneal_from: 1.0
+  epsilon_anneal_to: 0.1
+
+valid_command_bonus_lambda: 0.  # give reward when a generated command is in TextWorld's provided admissible command list. Note we don't use this in the paper.
+
+episodic_counting_bonus:
+  revisit_counting: True
+  revisit_counting_lambda_anneal_from: 0.1
+  revisit_counting_lambda_anneal_episodes: -1  # -1 if not annealing
+  revisit_counting_lambda_anneal_to: 0.0
+
+model:
+  use_pretrained_embedding: True
+  word_embedding_size: 300
+  word_embedding_trainable: False
+  char_embedding_size: 32
+  char_embedding_trainable: True
+  embedding_dropout: 0.
+  encoder_layers: 1
+  aggregation_layers: 3
+  encoder_conv_num: 2
+  aggregation_conv_num: 2
+  block_hidden_dim: 64
+  n_heads: 1
+  attention_dropout: 0.
+  block_dropout: 0.
+  action_scorer_hidden_dim: 64
+  question_answerer_hidden_dim: 64

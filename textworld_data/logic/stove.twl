@@ -1,0 +1,33 @@
+# stove
+type stove : s {
+    rules {
+        cook/stove/raw           :: $at(P, r) & $at(stove, r) & $in(f, I) & raw(f)                         -> fried(f) & cooked(f);
+        cook/stove/burned        :: $at(P, r) & $at(stove, r) & $in(f, I) & cooked(f) & edible(f)          -> burned(f) & inedible(f);
+        cook/stove/needs_cooking :: $at(P, r) & $at(stove, r) & $in(f, I) & needs_cooking(f) & inedible(f) -> fried(f) & edible(f) & cooked(f);
+
+        cook/onstove/raw           :: $at(P, r) & $at(stove, r) & $on(f, stove) & raw(f)                         -> fried(f) & cooked(f);
+        cook/onstove/burned        :: $at(P, r) & $at(stove, r) & $on(f, stove) & cooked(f) & edible(f)          -> burned(f) & inedible(f);
+        cook/onstove/needs_cooking :: $at(P, r) & $at(stove, r) & $on(f, stove) & needs_cooking(f) & inedible(f) -> fried(f) & edible(f) & cooked(f);
+
+    }
+
+    inform7 {
+        type {
+            kind :: "stove-like";
+            definition :: "stove-like is a source of heat.";
+        }
+
+        predicates {
+            heat_source(stove) :: "";
+        }
+
+        commands {
+            cook/stove/raw           :: "cook {f} with {stove}" :: "cooking the {f}";
+            cook/stove/burned        :: "cook {f} with {stove}" :: "cooking the {f}";
+            cook/stove/needs_cooking :: "cook {f} with {stove}" :: "cooking the {f}";
+            cook/onstove/raw           :: "cook {f}" :: "cooking the {f}";
+            cook/onstove/burned        :: "cook {f}" :: "cooking the {f}";
+            cook/onstove/needs_cooking :: "cook {f}" :: "cooking the {f}";
+        }
+    }
+}

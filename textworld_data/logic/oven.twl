@@ -1,0 +1,31 @@
+# oven
+type oven : c {
+    rules {
+        cook/oven/raw           :: $at(P, r) & $at(oven, r) & $in(f, I) & raw(f)                         -> roasted(f) & cooked(f);
+        cook/oven/burned        :: $at(P, r) & $at(oven, r) & $in(f, I) & cooked(f) & edible(f)          -> burned(f) & inedible(f);
+        cook/oven/needs_cooking :: $at(P, r) & $at(oven, r) & $in(f, I) & needs_cooking(f) & inedible(f) -> roasted(f) & edible(f) & cooked(f);
+        cook/inoven/raw           :: $at(P, r) & $at(oven, r) & $in(f, oven) & raw(f)                         -> roasted(f) & cooked(f);
+        cook/inoven/burned        :: $at(P, r) & $at(oven, r) & $in(f, oven) & cooked(f) & edible(f)          -> burned(f) & inedible(f);
+        cook/inoven/needs_cooking :: $at(P, r) & $at(oven, r) & $in(f, oven) & needs_cooking(f) & inedible(f) -> roasted(f) & edible(f) & cooked(f);
+    }
+
+    inform7 {
+        type {
+            kind :: "oven-like";
+            definition :: "oven-like is a source of heat.";
+        }
+
+        predicates {
+            heat_source(oven) :: "";
+        }
+
+        commands {
+            cook/oven/raw           :: "cook {f} with {oven}" :: "cooking the {f}";
+            cook/oven/burned        :: "cook {f} with {oven}" :: "cooking the {f}";
+            cook/oven/needs_cooking :: "cook {f} with {oven}" :: "cooking the {f}";
+            cook/inoven/raw           :: "cook {f}" :: "cooking the {f}";
+            cook/inoven/burned        :: "cook {f}" :: "cooking the {f}";
+            cook/inoven/needs_cooking :: "cook {f}" :: "cooking the {f}";
+        }
+    }
+}
