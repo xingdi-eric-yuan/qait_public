@@ -180,7 +180,6 @@ def train(data_path):
                 commands_per_step[i].append(commands[i])
 
             replay_info = [observation_strings_w_history, questions, possible_words] + replay_info
-            transition_cache.append(replay_info)
             admissible_commands = [set(item) - set(["look", "wait", "inventory"]) for item in infos["admissible_commands"]]
             vc_rewards = [float(c in ac) for c, ac in zip(commands, admissible_commands)]
             valid_command_rewards_np.append(np.array(vc_rewards))
@@ -207,6 +206,10 @@ def train(data_path):
                     running_avg_qa_loss.push(qa_loss)
 
             print_cmds.append(commands[0] if agent.prev_step_is_still_interacting[0] else "--")
+            # force stopping
+            if step_no == agent.max_nb_steps_per_episode - 1:
+                replay_info[-1] = torch.zeros_like(replay_info[-1])
+            transition_cache.append(replay_info)
             step_in_total += 1
             if (step_no == agent.max_nb_steps_per_episode - 1 ) or (step_no > 0 and np.sum(generic.to_np(replay_info[-1])) == 0):
                 break
