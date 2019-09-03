@@ -4,7 +4,8 @@ import os
 import copy
 import time
 import json
-    import visdom
+import visdom
+import torch
 import numpy as np
 import tempfile
 from os.path import join as pjoin
